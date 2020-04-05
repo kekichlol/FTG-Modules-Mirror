@@ -5,8 +5,7 @@
 #
 """ Userbot module containing commands related to android"""
 
-# requires: bs4
-# requires: requests
+# requires: bs4, requests
 
 import re
 from requests import get
