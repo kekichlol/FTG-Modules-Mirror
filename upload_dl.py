@@ -9,6 +9,8 @@
 """ Userbot module which contains everything related to \
     downloading/uploading from/to the server. """
 
+# requires: pySmartDL>=1.3.3
+
 import json
 import os
 import subprocess

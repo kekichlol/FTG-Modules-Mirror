@@ -1,3 +1,5 @@
+# requires: emoji>=0.5.4
+
 from datetime import datetime
 from emoji import emojize
 from math import sqrt

@@ -1,17 +1,18 @@
 # Copyright (C) 2019 The Raphielscape Company LLC.
 #
-# Licensed under the Raphielscape Public License, Version 1.d (the "License");
+# Licensed under the Raphielscape Public License, Version 1.c (the "License");
 # you may not use this file except in compliance with the License.
 #
 """ Userbot module containing various sites direct links generators"""
 
+# requires: humanize>=2.2.0
+
+from subprocess import PIPE, Popen
 import re
 import urllib.parse
 import json
-import requests
-
-from subprocess import PIPE, Popen
 from random import choice
+import requests
 from bs4 import BeautifulSoup
 from humanize import naturalsize
 
@@ -22,8 +23,7 @@ from userbot.events import register
 def subprocess_run(cmd):
     reply = ""
     subproc = Popen(cmd, stdout=PIPE, stderr=PIPE,
-                    shell=True, universal_newlines=True,
-                    executable="bash")
+                    shell=True, universal_newlines=True)
     talk = subproc.communicate()
     exitCode = subproc.returncode
     if exitCode != 0:
@@ -35,7 +35,7 @@ def subprocess_run(cmd):
     return talk
 
 
-@register(outgoing=True, pattern=r"^\.direct(?: |$)([\s\S]*)")
+@register(outgoing=True, pattern=r"^.direct(?: |$)([\s\S]*)")
 async def direct_link_generator(request):
     """ direct links generator """
     await request.edit("`Processing...`")
@@ -58,6 +58,8 @@ async def direct_link_generator(request):
             reply += gdrive(link)
         elif 'zippyshare.com' in link:
             reply += zippy_share(link)
+        elif 'mega.' in link:
+            reply += mega_dl(link)
         elif 'yadi.sk' in link:
             reply += yandex_disk(link)
         elif 'cloud.mail.ru' in link:
@@ -68,6 +70,8 @@ async def direct_link_generator(request):
             reply += sourceforge(link)
         elif 'osdn.net' in link:
             reply += osdn(link)
+        elif 'github.com' in link:
+            reply += github(link)
         elif 'androidfilehost.com' in link:
             reply += androidfilehost(link)
         else:
@@ -168,6 +172,31 @@ def yandex_disk(url: str) -> str:
     return reply
 
 
+def mega_dl(url: str) -> str:
+    """ MEGA.nz direct links generator
+    Using https://github.com/tonikelope/megadown"""
+    reply = ''
+    try:
+        link = re.findall(r'\bhttps?://.*mega.*\.nz\S+', url)[0]
+    except IndexError:
+        reply = "`No MEGA.nz links found`\n"
+        return reply
+    cmd = f'bin/megadown -q -m {link}'
+    result = subprocess_run(cmd)
+    try:
+        data = json.loads(result[0])
+    except json.JSONDecodeError:
+        reply += "`Error: Can't extract the link`\n"
+        return reply
+    except IndexError:
+        return reply
+    dl_url = data['url']
+    name = data['file_name']
+    size = naturalsize(int(data['file_size']))
+    reply += f'[{name} ({size})]({dl_url})\n'
+    return reply
+
+
 def cm_ru(url: str) -> str:
     """ cloud.mail.ru direct links generator
     Using https://github.com/JrMasterModelBuilder/cmrudl.py"""
@@ -254,6 +283,25 @@ def osdn(url: str) -> str:
     return reply
 
 
+def github(url: str) -> str:
+    """ GitHub direct links generator """
+    try:
+        link = re.findall(r'\bhttps?://.*github\.com.*releases\S+', url)[0]
+    except IndexError:
+        reply = "`No GitHub Releases links found`\n"
+        return reply
+    reply = ''
+    dl_url = ''
+    download = requests.get(url, stream=True, allow_redirects=False)
+    try:
+        dl_url = download.headers["location"]
+    except KeyError:
+        reply += "`Error: Can't extract the link`\n"
+    name = link.split('/')[-1]
+    reply += f'[{name}]({dl_url}) '
+    return reply
+
+
 def androidfilehost(url: str) -> str:
     """ AFH direct links generator """
     try:
@@ -320,9 +368,10 @@ def useragent():
 
 CMD_HELP.update({
     "direct":
-    ".direct <url> <url>\n"
-    "Usage: Generate direct download link from supported URL(s)\n"
-    "Supported websites:\n"
+    ">`.direct <url>`"
+    "\nUsage: Reply to a link or paste a URL to\n"
+    "generate a direct download link\n\n"
+    "List of supported URLs:\n"
     "`Google Drive - MEGA.nz - Cloud Mail - Yandex.Disk - AFH - "
     "ZippyShare - MediaFire - SourceForge - OSDN - GitHub`"
 })
