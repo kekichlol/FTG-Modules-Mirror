@@ -5,8 +5,6 @@
 #
 """ Userbot module containing commands related to android"""
 
-# requires: bs4, requests
-
 import re
 from requests import get
 from bs4 import BeautifulSoup
