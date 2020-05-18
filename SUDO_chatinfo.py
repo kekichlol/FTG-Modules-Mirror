@@ -12,7 +12,6 @@ from userbot.events import register
 
 @register(pattern=".chatinfo(?: |$)(.*)", outgoing=True)
 async def info(event):
-	""" Gets info of a chat. Some info might be limited due to missing permissions """
     await event.reply("`Analysing the chat...`")
     chat = await get_chatinfo(event)
     caption = await fetch_info(chat, event)
