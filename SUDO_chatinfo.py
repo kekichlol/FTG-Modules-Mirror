@@ -1,3 +1,5 @@
+# requires: emoji>=0.5.4
+
 from datetime import datetime
 from emoji import emojize
 from math import sqrt
@@ -6,9 +8,7 @@ from telethon.tl.functions.messages import GetHistoryRequest, CheckChatInviteReq
 from telethon.tl.types import MessageActionChannelMigrateFrom, ChannelParticipantsAdmins
 from telethon.errors import (ChannelInvalidError, ChannelPrivateError, ChannelPublicGroupNaError, InviteHashEmptyError, InviteHashExpiredError, InviteHashInvalidError)
 from telethon.utils import get_input_location
-from userbot.events import register, errors_handler
-
-# requires: emoji
+from userbot.events import register
 
 @register(pattern=".chatinfo(?: |$)(.*)", outgoing=True)
 async def info(event):
