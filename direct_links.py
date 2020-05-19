@@ -5,8 +5,7 @@
 #
 """ Userbot module containing various sites direct links generators"""
 
-# requires: humanize>=2.2.0
-# requires: bs4
+# requires: humanize>=2.2.0, bs4
 
 from subprocess import PIPE, Popen
 import re
