@@ -9,8 +9,7 @@
 """ Userbot module which contains everything related to \
     downloading/uploading from/to the server. """
 
-# requires: pySmartDL
-# requires: hachoir
+# requires: pySmartDL, hachoir
 
 import json
 import os
